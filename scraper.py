@@ -4,6 +4,7 @@ import scrapy
 from scrapy.crawler import CrawlerProcess
 from scrapy.utils.response import open_in_browser
 import csv
+import sys
 
 myData = [['Name', 'Parent', 'Age']]
 
@@ -32,7 +33,6 @@ class SpidyQuotesViewStateSpider(scrapy.Spider):
                 },
                 callback=self.parse_districts
             )
-            break
 
     def parse_districts(self, response):
         for district in response.css('select#ContentPlaceHolder1_ddlDistrict > option ::attr(value)').extract():
@@ -63,14 +63,9 @@ class SpidyQuotesViewStateSpider(scrapy.Spider):
             #     'mom/dad': quote.css('span#ContentPlaceHolder1_Repeater2_Label7_1 ::text').extract_first(),
             #     'age': quote.css('span#ContentPlaceHolder1_Repeater2_Label8_1 ::text').extract_first(),
             # }
-            myData.append([quote.css('span#ContentPlaceHolder1_Repeater2_Label12_1 ::text').extract_first().encode('utf-8'),quote.css('span#ContentPlaceHolder1_Repeater2_Label7_1 ::text').extract_first().encode('utf-8'), quote.css('span#ContentPlaceHolder1_Repeater2_Label8_1 ::text').extract_first().encode('utf-8')])
-            print([quote.css('span#ContentPlaceHolder1_Repeater2_Label12_1 ::text').extract_first(),quote.css('span#ContentPlaceHolder1_Repeater2_Label7_1 ::text').extract_first(), quote.css('span#ContentPlaceHolder1_Repeater2_Label8_1 ::text').extract_first()])
-            f = open('csvfile.csv','w')
-            f.write('hi there\n') #Give your csv text here.
-            f.write(quote.css('span#ContentPlaceHolder1_Repeater2_Label12_1 ::text').extract_first() + "," + quote.css('span#ContentPlaceHolder1_Repeater2_Label7_1 ::text').extract_first() + "," + quote.css('span#ContentPlaceHolder1_Repeater2_Label8_1 ::text').extract_first())
+            # myData.append([quote.css('span#ContentPlaceHolder1_Repeater2_Label12_1 ::text').extract_first(),quote.css('span#ContentPlaceHolder1_Repeater2_Label7_1 ::text').extract_first().encode('utf-8'), quote.css('span#ContentPlaceHolder1_Repeater2_Label8_1 ::text').extract_first().encode('utf-8')])
+            myData.append(quote.css('span#ContentPlaceHolder1_Repeater2_Label12_1 ::text').extract_first() + "," + quote.css('span#ContentPlaceHolder1_Repeater2_Label7_1 ::text').extract_first() + "," + quote.css('span#ContentPlaceHolder1_Repeater2_Label8_1 ::text').extract_first())
             ## Python will convert \n to os.linesep
-            f.close()
-            break
 
 
 if __name__ == "__main__":
@@ -81,6 +76,10 @@ if __name__ == "__main__":
     process.start() # the script will block here until the crawling is finished
     csv.register_dialect('myDialect', quoting=csv.QUOTE_NONE)
     myFile = open('csvexample4.csv', 'w', encoding='utf-8')
-    with myFile:  
-       writer = csv.writer(myFile, dialect='myDialect')
-       writer.writerows(myData)
+    f = open("test.csv", 'w')
+    sys.stdout = f
+    for s in myData:
+        print (s)
+    # with myFile:  
+    #    writer = csv.writer(myFile, dialect='myDialect')
+    #    writer.writerows(myData)
